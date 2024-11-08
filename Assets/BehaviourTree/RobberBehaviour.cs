@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Numerics;
 using UnityEngine;
 using UnityEngine.AI;
+using Vector3 = UnityEngine.Vector3;
 public class RobberBehaviour : MonoBehaviour
 {
     BehaviourTree tree;
@@ -67,15 +68,20 @@ public class RobberBehaviour : MonoBehaviour
         return GoToLocation(van.transform.position);
     }
 
+    private Node.Status GoToLocation(UnityEngine.Vector3 position)
+    {
+        throw new NotImplementedException();
+    }
+
     Node.Status GoToLocation(Vector3 destination)
     {
-        float distanceToTarget = Vector3.Distance(destination, this.transform.position);
+        float distanceToTarget = UnityEngine.Vector3.Distance(destination, this.transform.position);
         if(state == ActionState.IDLE)
         {
             agent.SetDestination(destination);
             state = ActionState.WORKING;
         }
-        else if (Vector3.Distance(agent.pathEndPosition, destination)  >= 2)
+        else if (UnityEngine.Vector3.Distance(agent.pathEndPosition, destination)  >= 2)
         {
             state = ActionState.IDLE;
             return Node.Status.FAILURE;

@@ -10,10 +10,15 @@ public class RobberBehaviour : MonoBehaviour
     BehaviourTree tree;
     public GameObject diamond;
     public GameObject van;
+    public GameObject backdoor;
+    public GameObject frontdoor;
     NavMeshAgent agent;
     
     public enum ActionState { IDLE, WORKING };
     ActionState state = ActionState.IDLE;
+
+    Node.Status treeStatus = Node.Status.RUNNING;
+    
     
     // Start is called before the first frame update
     void Start()
@@ -21,17 +26,26 @@ public class RobberBehaviour : MonoBehaviour
         agent = this.GetComponent<NavMeshAgent>();
 
         tree = new BehaviourTree();
-        Node steal = new Node ("Steal Something");
+        Sequence steal = new Sequence("Steal Something");
         Node goToDiamond = new Leaf("Go To Diamond", GoToDiamond);
+        Node goToBackDoor = new Leaf("Go To BackDoor", GoToBackDoor);
+        Node goToFrontDoor = new Leaf("Go To FrontDoor", GoToFrontDoor);
         Node goToVan = new Leaf("Go To Van", GoToVan);
+        Selector opendoor = new Selector("Open Door");
 
+        opendoor.AddChild(goToFrontDoor);
+        opendoor.AddChild(goToBackDoor);
+        opendoor.AddChild(goToFrontDoor);
+
+        steal.AddChild(goToBackDoor);
         steal.AddChild(goToDiamond);
+        //steal.AddChild(goToBackDoor);
         steal.AddChild(goToVan);    
         tree.AddChild(steal);
 
         tree.PrintTree();
 
-        tree.Process();
+        
 
         
     }
@@ -39,6 +53,14 @@ public class RobberBehaviour : MonoBehaviour
     public Node.Status GoToDiamond()
     {
         return GoToLocation(diamond.transform.position);
+    }
+    public Node.Status GoToBackDoor()
+    {
+        return GoToLocation(backdoor.transform.position);
+    }
+    public Node.Status GoToFrontDoor()
+    {
+        return GoToLocation(frontdoor.transform.position);
     }
     public Node.Status GoToVan()
     {
@@ -68,6 +90,9 @@ public class RobberBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(treeStatus == Node.Status.RUNNING)
+            treeStatus = tree.Process();
+        
         
     }
 }
